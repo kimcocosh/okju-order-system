@@ -51,7 +51,7 @@ var FREE_SHIPPING_THRESHOLD = 50000;
 // ===== 웹앱 진입점 =====
 function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('index')
-    .setTitle('옥수주조 손님발주 시스템')
+    .setTitle('옥수주조 주문하기')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
