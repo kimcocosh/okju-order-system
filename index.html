@@ -53,8 +53,9 @@
     .gate-btn:disabled { background:#c8d8c8; color:#8a9a8a; cursor:not-allowed; }
     .gate-note { color:var(--text-light); font-size:0.75rem; text-align:center; margin-top:14px; line-height:1.5; }
 
-    /* ── 메인 콘텐츠 ── */
-    #mainContent { display:none; }
+    /* ── 메인 콘텐츠: JS로 gate 통과 후 표시 ── */
+    #mainContent { display:none !important; }
+    #mainContent.visible { display:block !important; }
 
     .header { background:var(--green-dark); color:var(--white); padding:20px 16px 16px; text-align:center; }
     .header h1 { font-size:1.4rem; letter-spacing:2px; margin-bottom:4px; }
@@ -564,7 +565,7 @@ function toggleGateBtn() {
 }
 function passGate() {
   document.getElementById('adultGate').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('mainContent').classList.add('visible');
   window.scrollTo(0, 0);
 }
 
