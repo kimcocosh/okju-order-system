@@ -267,23 +267,39 @@
     .modal-btn:hover { background:var(--green-dark); }
 
     /* ── 카탈로그 모달 ── */
+    #catalogModal { padding:0; align-items:stretch; justify-content:stretch; }
     .catalog-modal-inner {
-      background:var(--white); border-radius:16px; padding:0;
-      max-width:680px; width:100%; max-height:92vh; overflow:hidden;
+      background:var(--white); border-radius:0; padding:0;
+      width:100%; height:100%; max-height:100vh; overflow:hidden;
       display:flex; flex-direction:column;
     }
     .catalog-modal-header {
       background:var(--green-mid); color:var(--white);
-      padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
-      flex-shrink:0;
+      padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0; gap:10px;
     }
-    .catalog-modal-header span { font-weight:600; font-size:0.95rem; }
+    .catalog-modal-header span { font-weight:600; font-size:0.9rem; }
+    .catalog-header-btns { display:flex; gap:8px; align-items:center; }
+    .catalog-newtab {
+      padding:5px 10px; background:rgba(255,255,255,0.2); color:var(--white);
+      border:1px solid rgba(255,255,255,0.4); border-radius:6px;
+      font-size:0.75rem; font-weight:600; cursor:pointer; font-family:inherit;
+      white-space:nowrap; text-decoration:none; display:inline-block;
+    }
     .catalog-close {
-      background:none; border:none; color:var(--white); font-size:1.5rem;
-      cursor:pointer; line-height:1; padding:0 4px;
+      background:none; border:none; color:var(--white); font-size:1.6rem;
+      cursor:pointer; line-height:1; padding:0 2px;
     }
-    .catalog-img-wrap { overflow-y:auto; padding:16px; }
-    .catalog-img-wrap img { width:100%; height:auto; border-radius:8px; display:block; }
+    .catalog-img-wrap {
+      overflow:auto; flex:1;
+      -webkit-overflow-scrolling:touch;
+    }
+    .catalog-img-wrap img {
+      width:auto; height:auto;
+      min-width:900px;   /* 가로 스크롤로 글씨 선명하게 */
+      max-width:none;
+      display:block;
+    }
 
     /* ── 반응형 ── */
     @media (max-width:400px) {
@@ -298,15 +314,12 @@
      성인인증 게이트 (첫 화면)
 ══════════════════════════════════════ -->
 <div id="adultGate">
-  <div class="gate-logo">🍶</div>
-  <div class="gate-brand">옥수주조</div>
-  <div class="gate-sub">OKSU BREWING</div>
+  <img src="https://raw.githubusercontent.com/kimcocosh/okju-order-system/main/logo.jpg"
+       alt="옥수주조"
+       style="max-width:220px;width:80%;margin-bottom:36px;border-radius:12px;">
 
   <div class="gate-card">
-    <div class="gate-warning">
-      ⚠️ 주류 판매 사이트입니다<br>
-      만 19세 미만은 구매하실 수 없습니다
-    </div>
+    <div>
 
     <div class="gate-check-row">
       <input type="checkbox" id="adultGateCheck" onchange="toggleGateBtn()">
@@ -512,7 +525,12 @@
   <div class="catalog-modal-inner">
     <div class="catalog-modal-header">
       <span>🍶 옥수주조 상품 카탈로그</span>
-      <button class="catalog-close" onclick="closeCatalog()">✕</button>
+      <div class="catalog-header-btns">
+        <a class="catalog-newtab"
+           href="https://raw.githubusercontent.com/kimcocosh/okju-order-system/main/catalog.jpg"
+           target="_blank">새 탭으로 보기</a>
+        <button class="catalog-close" onclick="closeCatalog()">✕</button>
+      </div>
     </div>
     <div class="catalog-img-wrap">
       <img src="https://raw.githubusercontent.com/kimcocosh/okju-order-system/main/catalog.jpg"
