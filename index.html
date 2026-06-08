@@ -7,437 +7,580 @@
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <style>
     :root {
-      --green-dark: #1a3a1a;
-      --green-mid: #2d5a2d;
+      --green-dark:  #1a3a1a;
+      --green-mid:   #2d5a2d;
       --green-light: #4a7c4a;
-      --green-pale: #e8f0e8;
-      --accent: #8bc34a;
-      --gold: #c9a84c;
-      --text: #1a2e1a;
-      --text-light: #5a7a5a;
-      --border: #c8d8c8;
-      --white: #ffffff;
-      --danger: #d32f2f;
-      --shadow: 0 2px 8px rgba(0,0,0,0.12);
+      --green-pale:  #e8f0e8;
+      --accent:      #8bc34a;
+      --gold:        #c9a84c;
+      --text:        #1a2e1a;
+      --text-light:  #5a7a5a;
+      --border:      #c8d8c8;
+      --white:       #ffffff;
+      --danger:      #d32f2f;
+      --shadow:      0 2px 8px rgba(0,0,0,0.12);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif; background:#f5f7f5; color:var(--text); min-height:100vh; }
 
-    body {
-      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-      background: #f5f7f5;
-      color: var(--text);
-      min-height: 100vh;
+    /* ── 성인인증 게이트 ── */
+    #adultGate {
+      position:fixed; inset:0; background:var(--green-dark);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      z-index:200; padding:24px;
     }
-
-    /* ── 헤더 ── */
-    .header {
-      background: var(--green-dark);
-      color: var(--white);
-      padding: 20px 16px 16px;
-      text-align: center;
+    .gate-logo { font-size:3rem; margin-bottom:8px; }
+    .gate-brand { color:var(--white); font-size:1.6rem; font-weight:700; letter-spacing:3px; margin-bottom:4px; }
+    .gate-sub { color:#a8c8a8; font-size:0.85rem; letter-spacing:1px; margin-bottom:40px; }
+    .gate-card {
+      background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15);
+      border-radius:16px; padding:28px 24px; max-width:380px; width:100%;
     }
-    .header h1 { font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 4px; }
-    .header p { font-size: 0.8rem; color: #a8c8a8; letter-spacing: 1px; }
+    .gate-warning {
+      background:rgba(211,47,47,0.15); border:1px solid rgba(211,47,47,0.4);
+      border-radius:8px; padding:12px 14px; margin-bottom:20px;
+      color:#ffaaaa; font-size:0.85rem; line-height:1.5; text-align:center;
+    }
+    .gate-check-row {
+      display:flex; align-items:flex-start; gap:12px; margin-bottom:24px; cursor:pointer;
+    }
+    .gate-check-row input[type="checkbox"] {
+      width:22px; height:22px; accent-color:var(--accent); flex-shrink:0; margin-top:2px; cursor:pointer;
+    }
+    .gate-check-row label { color:#ddeedd; font-size:0.9rem; line-height:1.6; cursor:pointer; }
+    .gate-check-row label strong { color:var(--accent); }
+    .gate-btn {
+      width:100%; padding:16px; background:var(--green-mid); color:var(--white);
+      border:none; border-radius:10px; font-size:1rem; font-weight:700;
+      cursor:pointer; font-family:inherit; letter-spacing:1px; transition:all 0.2s;
+    }
+    .gate-btn:hover:not(:disabled) { background:var(--green-light); transform:translateY(-1px); }
+    .gate-btn:disabled { background:#3a4a3a; color:#6a7a6a; cursor:not-allowed; }
+    .gate-note { color:#6a8a6a; font-size:0.75rem; text-align:center; margin-top:14px; line-height:1.5; }
 
-    /* ── 컨테이너 ── */
-    .container { max-width: 560px; margin: 0 auto; padding: 16px; }
+    /* ── 메인 콘텐츠 ── */
+    #mainContent { display:none; }
+
+    .header { background:var(--green-dark); color:var(--white); padding:20px 16px 16px; text-align:center; }
+    .header h1 { font-size:1.4rem; letter-spacing:2px; margin-bottom:4px; }
+    .header p { font-size:0.8rem; color:#a8c8a8; letter-spacing:1px; }
+
+    .container { max-width:560px; margin:0 auto; padding:16px; }
 
     /* ── 카드 ── */
-    .card {
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
+    .card { background:var(--white); border-radius:12px; box-shadow:var(--shadow); margin-bottom:16px; overflow:hidden; }
     .card-header {
-      background: var(--green-mid);
-      color: var(--white);
-      padding: 12px 16px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background:var(--green-mid); color:var(--white);
+      padding:12px 16px; font-size:0.9rem; font-weight:600; letter-spacing:0.5px;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
     }
-    .card-body { padding: 16px; }
+    .card-header-left { display:flex; align-items:center; gap:8px; }
+    .card-body { padding:16px; }
 
-    /* ── 성인인증 ── */
-    .adult-check { display: flex; align-items: flex-start; gap: 12px; padding: 4px 0; }
-    .adult-check input[type="checkbox"] {
-      width: 22px; height: 22px; cursor: pointer;
-      accent-color: var(--green-mid); flex-shrink: 0; margin-top: 1px;
+    /* ── 카탈로그 버튼 ── */
+    .catalog-btn {
+      padding:5px 12px; background:rgba(255,255,255,0.2); color:var(--white);
+      border:1px solid rgba(255,255,255,0.4); border-radius:20px;
+      font-size:0.78rem; font-weight:600; cursor:pointer; font-family:inherit;
+      transition:all 0.15s; white-space:nowrap;
     }
-    .adult-check label { font-size: 0.88rem; line-height: 1.5; cursor: pointer; color: var(--text); }
-    .adult-check label strong { color: var(--danger); }
+    .catalog-btn:hover { background:rgba(255,255,255,0.35); }
 
-    /* ── 상품 섹션 ── */
+    /* ── 상품 ── */
     .product-section-label {
-      font-size: 0.8rem; font-weight: 700; color: var(--text-light);
-      text-transform: uppercase; letter-spacing: 1px;
-      margin: 12px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
+      font-size:0.78rem; font-weight:700; color:var(--text-light);
+      letter-spacing:1px; margin:12px 0 8px; padding-bottom:4px;
+      border-bottom:1px solid var(--border);
     }
-    .product-section-label:first-child { margin-top: 0; }
-
-    /* ── 상품 행 ── */
+    .product-section-label:first-child { margin-top:0; }
     .product-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 0; border-bottom: 1px solid #f0f0f0;
+      display:flex; align-items:center; gap:10px;
+      padding:8px 0; border-bottom:1px solid #f0f0f0;
     }
-    .product-row:last-child { border-bottom: none; }
-    .product-name { flex: 1; font-size: 0.88rem; line-height: 1.3; }
-    .product-price { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; }
-
-    .qty-control { display: flex; align-items: center; gap: 4px; }
+    .product-row:last-child { border-bottom:none; }
+    .product-name { flex:1; font-size:0.88rem; line-height:1.3; }
+    .product-price { font-size:0.78rem; color:var(--text-light); white-space:nowrap; }
+    .qty-control { display:flex; align-items:center; gap:4px; }
     .qty-btn {
-      width: 28px; height: 28px; border: 1.5px solid var(--border);
-      background: var(--white); border-radius: 6px; font-size: 1.1rem;
-      line-height: 1; cursor: pointer; display: flex; align-items: center;
-      justify-content: center; color: var(--green-mid); font-weight: 700; transition: all 0.15s;
+      width:28px; height:28px; border:1.5px solid var(--border); background:var(--white);
+      border-radius:6px; font-size:1.1rem; cursor:pointer; display:flex;
+      align-items:center; justify-content:center; color:var(--green-mid);
+      font-weight:700; transition:all 0.15s;
     }
-    .qty-btn:hover { background: var(--green-pale); border-color: var(--green-mid); }
-    .qty-btn:active { transform: scale(0.92); }
-    .qty-display { width: 32px; text-align: center; font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .qty-btn:hover { background:var(--green-pale); border-color:var(--green-mid); }
+    .qty-btn:active { transform:scale(0.92); }
+    .qty-display { width:32px; text-align:center; font-size:0.95rem; font-weight:600; }
 
-    /* ── 주문 요약 ── */
+    /* ── 요약 ── */
     .summary-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 0; font-size: 0.88rem; border-bottom: 1px solid #f0f0f0;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 0; font-size:0.88rem; border-bottom:1px solid #f0f0f0;
     }
-    .summary-row:last-child { border-bottom: none; }
+    .summary-row:last-child { border-bottom:none; }
     .summary-row.total {
-      font-size: 1.05rem; font-weight: 700; color: var(--green-dark);
-      margin-top: 4px; padding-top: 12px;
-      border-top: 2px solid var(--green-mid); border-bottom: none;
+      font-size:1.05rem; font-weight:700; color:var(--green-dark);
+      margin-top:4px; padding-top:12px; border-top:2px solid var(--green-mid); border-bottom:none;
     }
-    .summary-row .label { color: var(--text-light); }
-    .summary-row .value { font-weight: 600; }
+    .summary-row .label { color:var(--text-light); }
+    .summary-row .value { font-weight:600; }
     .free-badge {
-      background: var(--accent); color: var(--white); font-size: 0.7rem;
-      padding: 2px 6px; border-radius: 10px; font-weight: 700; margin-left: 6px;
+      background:var(--accent); color:var(--white); font-size:0.7rem;
+      padding:2px 6px; border-radius:10px; font-weight:700; margin-left:6px;
     }
 
-    /* ── 알림 배너 ── */
+    /* ── 알림 ── */
     .notice {
-      background: var(--green-pale); border-left: 3px solid var(--green-mid);
-      border-radius: 6px; padding: 10px 12px; font-size: 0.82rem;
-      color: var(--text-light); margin-bottom: 12px; line-height: 1.5;
+      background:var(--green-pale); border-left:3px solid var(--green-mid);
+      border-radius:6px; padding:10px 12px; font-size:0.82rem;
+      color:var(--text-light); margin-bottom:12px; line-height:1.5;
     }
-    .notice.warning { background: #fff3e0; border-left-color: #f57c00; color: #7a4a00; }
-    .notice.error { background: #fdecea; border-left-color: var(--danger); color: var(--danger); }
+    .notice.warning { background:#fff3e0; border-left-color:#f57c00; color:#7a4a00; }
+    .notice.error { background:#fdecea; border-left-color:var(--danger); color:var(--danger); }
 
-    /* ── 폼 입력 ── */
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-light); margin-bottom: 5px; }
-    .form-group label .req { color: var(--danger); margin-left: 2px; }
+    /* ── 폼 ── */
+    .form-group { margin-bottom:14px; }
+    .form-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--text-light); margin-bottom:5px; }
+    .form-group label .req { color:var(--danger); margin-left:2px; }
     .form-group input,
     .form-group textarea {
-      width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
-      border-radius: 8px; font-size: 0.9rem; font-family: inherit;
-      color: var(--text); transition: border-color 0.15s; background: var(--white);
+      width:100%; padding:10px 12px; border:1.5px solid var(--border);
+      border-radius:8px; font-size:0.9rem; font-family:inherit; color:var(--text);
+      transition:border-color 0.15s; background:var(--white);
     }
     .form-group input:focus,
-    .form-group textarea:focus { outline: none; border-color: var(--green-mid); }
-    .form-group textarea { resize: vertical; min-height: 70px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group textarea:focus { outline:none; border-color:var(--green-mid); }
+    .form-group textarea { resize:vertical; min-height:70px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
     /* ── 주문번호 ── */
     .order-number-box {
-      background: #f9f6ef; border: 1.5px solid var(--gold);
-      border-radius: 10px; padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background:#f9f6ef; border:1.5px solid var(--gold);
+      border-radius:10px; padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-    .order-number-label { font-size: 0.78rem; color: var(--text-light); margin-bottom: 3px; }
-    .order-number-value { font-size: 1.1rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+    .order-number-label { font-size:0.78rem; color:var(--text-light); margin-bottom:3px; }
+    .order-number-value { font-size:1.1rem; font-weight:700; color:var(--gold); letter-spacing:1px; }
     .refresh-btn {
-      padding: 6px 12px; background: var(--white); border: 1.5px solid var(--gold);
-      border-radius: 6px; font-size: 0.78rem; color: var(--gold); cursor: pointer;
-      font-family: inherit; font-weight: 600; transition: all 0.15s; white-space: nowrap;
+      padding:6px 12px; background:var(--white); border:1.5px solid var(--gold);
+      border-radius:6px; font-size:0.78rem; color:var(--gold); cursor:pointer;
+      font-family:inherit; font-weight:600; transition:all 0.15s; white-space:nowrap;
     }
-    .refresh-btn:hover { background: #f9f6ef; }
+    .refresh-btn:hover { background:#f9f6ef; }
 
     /* ── 제출 버튼 ── */
     .submit-btn {
-      width: 100%; padding: 16px; background: var(--green-mid); color: var(--white);
-      border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 700;
-      cursor: pointer; font-family: inherit; letter-spacing: 1px; transition: all 0.2s; margin-top: 4px;
+      width:100%; padding:16px; background:var(--green-mid); color:var(--white);
+      border:none; border-radius:10px; font-size:1.05rem; font-weight:700;
+      cursor:pointer; font-family:inherit; letter-spacing:1px; transition:all 0.2s; margin-top:4px;
     }
-    .submit-btn:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,90,45,0.3); }
-    .submit-btn:active:not(:disabled) { transform: translateY(0); }
-    .submit-btn:disabled { background: #b0b8b0; cursor: not-allowed; opacity: 0.7; }
+    .submit-btn:hover:not(:disabled) { background:var(--green-dark); transform:translateY(-1px); box-shadow:0 4px 12px rgba(45,90,45,0.3); }
+    .submit-btn:active:not(:disabled) { transform:translateY(0); }
+    .submit-btn:disabled { background:#b0b8b0; cursor:not-allowed; opacity:0.7; }
 
-    /* ── 성공 모달 ── */
+    /* ── 모달 공통 ── */
     .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-      z-index: 100; align-items: center; justify-content: center; padding: 16px;
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      z-index:100; align-items:center; justify-content:center; padding:16px;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active { display:flex; }
     .modal {
-      background: var(--white); border-radius: 16px; padding: 28px 24px 24px;
-      max-width: 380px; width: 100%; text-align: center;
+      background:var(--white); border-radius:16px; padding:24px;
+      max-width:400px; width:100%; max-height:90vh; overflow-y:auto;
     }
-    .modal-icon { font-size: 2.8rem; margin-bottom: 10px; }
-    .modal-title { font-size: 1.15rem; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
-    .modal-subtitle { font-size: 0.83rem; color: var(--text-light); margin-bottom: 18px; line-height: 1.5; }
 
-    /* 주문번호 박스 (모달) */
-    .modal-order-box {
-      background: #f9f6ef; border: 1.5px solid var(--gold);
-      border-radius: 10px; padding: 10px 16px; margin-bottom: 16px;
+    /* ── 주문 확인 모달 ── */
+    .confirm-title { font-size:1.1rem; font-weight:700; color:var(--green-dark); margin-bottom:16px; text-align:center; }
+    .confirm-items {
+      background:#f8f8f8; border-radius:8px; padding:12px;
+      margin-bottom:14px; font-size:0.85rem;
     }
-    .modal-order-label { font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; }
-    .modal-order-number { font-size: 1.25rem; font-weight: 700; color: var(--gold); letter-spacing: 1.5px; }
-    .modal-order-hint { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+    .confirm-item-row {
+      display:flex; justify-content:space-between; padding:4px 0;
+      border-bottom:1px solid #eee;
+    }
+    .confirm-item-row:last-child { border-bottom:none; }
+    .confirm-total-row {
+      display:flex; justify-content:space-between; align-items:center;
+      background:var(--green-pale); border-radius:8px; padding:12px 14px; margin-bottom:14px;
+    }
+    .confirm-total-label { font-size:0.9rem; color:var(--text-light); }
+    .confirm-total-amount { font-size:1.3rem; font-weight:700; color:var(--green-dark); }
 
-    /* 계좌 박스 (모달) */
-    .modal-account-box {
-      background: var(--green-pale); border: 1.5px solid var(--green-light);
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; text-align: left;
+    /* 계좌 박스 (확인 모달) */
+    .confirm-account-box {
+      background:#f0f4f0; border:1.5px solid var(--green-light);
+      border-radius:10px; padding:12px 14px; margin-bottom:16px;
     }
-    .modal-account-bank { font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; }
-    .modal-account-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    }
-    .modal-account-number { font-size: 1.1rem; font-weight: 700; color: var(--green-dark); letter-spacing: 1px; }
-    .modal-account-holder { font-size: 0.8rem; color: var(--text-light); margin-top: 5px; }
-    .modal-account-notice { font-size: 0.78rem; color: var(--text-light); margin-top: 8px; line-height: 1.4; }
+    .confirm-account-label { font-size:0.75rem; color:var(--text-light); margin-bottom:4px; }
+    .confirm-account-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .confirm-account-number { font-size:1.1rem; font-weight:700; color:var(--green-dark); letter-spacing:1px; }
+    .confirm-account-holder { font-size:0.8rem; color:var(--text-light); margin-top:5px; }
 
     .copy-btn {
-      padding: 6px 14px; background: var(--green-mid); color: var(--white);
-      border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer;
-      font-family: inherit; font-weight: 600; transition: background 0.15s; white-space: nowrap;
+      padding:6px 14px; background:var(--green-mid); color:var(--white);
+      border:none; border-radius:6px; font-size:0.8rem; cursor:pointer;
+      font-family:inherit; font-weight:600; transition:background 0.15s; white-space:nowrap;
     }
-    .copy-btn:hover { background: var(--green-dark); }
-    .copy-btn.copied { background: var(--accent); }
+    .copy-btn:hover { background:var(--green-dark); }
+    .copy-btn.copied { background:var(--accent); }
 
-    .modal-btn {
-      width: 100%; padding: 13px; background: var(--green-mid); color: var(--white);
-      border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
-      cursor: pointer; font-family: inherit;
+    .confirm-btn-row { display:flex; gap:10px; }
+    .cancel-btn {
+      flex:1; padding:13px; background:#f0f0f0; color:#666;
+      border:none; border-radius:8px; font-size:0.95rem; font-weight:600;
+      cursor:pointer; font-family:inherit; transition:background 0.15s;
     }
-    .modal-btn:hover { background: var(--green-dark); }
+    .cancel-btn:hover { background:#e0e0e0; }
+    .ok-btn {
+      flex:2; padding:13px; background:var(--green-mid); color:var(--white);
+      border:none; border-radius:8px; font-size:0.95rem; font-weight:700;
+      cursor:pointer; font-family:inherit; transition:background 0.15s;
+    }
+    .ok-btn:hover { background:var(--green-dark); }
+    .ok-btn:disabled { background:#b0b8b0; cursor:not-allowed; }
+
+    /* ── 성공 모달 ── */
+    .success-modal { text-align:center; }
+    .modal-icon { font-size:2.8rem; margin-bottom:10px; }
+    .modal-title { font-size:1.15rem; font-weight:700; color:var(--green-dark); margin-bottom:6px; }
+    .modal-subtitle { font-size:0.83rem; color:var(--text-light); margin-bottom:18px; line-height:1.5; }
+    .modal-order-box {
+      background:#f9f6ef; border:1.5px solid var(--gold);
+      border-radius:10px; padding:10px 16px; margin-bottom:16px;
+    }
+    .modal-order-label { font-size:0.75rem; color:var(--text-light); margin-bottom:4px; }
+    .modal-order-number { font-size:1.25rem; font-weight:700; color:var(--gold); letter-spacing:1.5px; }
+    .modal-order-hint { font-size:0.75rem; color:var(--text-light); margin-top:4px; }
+    .modal-account-box {
+      background:var(--green-pale); border:1.5px solid var(--green-light);
+      border-radius:10px; padding:12px 14px; margin-bottom:16px; text-align:left;
+    }
+    .modal-account-bank { font-size:0.75rem; color:var(--text-light); margin-bottom:4px; }
+    .modal-account-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .modal-account-number { font-size:1.1rem; font-weight:700; color:var(--green-dark); letter-spacing:1px; }
+    .modal-account-holder { font-size:0.8rem; color:var(--text-light); margin-top:5px; }
+    .modal-btn {
+      width:100%; padding:13px; background:var(--green-mid); color:var(--white);
+      border:none; border-radius:8px; font-size:0.95rem; font-weight:600;
+      cursor:pointer; font-family:inherit;
+    }
+    .modal-btn:hover { background:var(--green-dark); }
+
+    /* ── 카탈로그 모달 ── */
+    .catalog-modal-inner {
+      background:var(--white); border-radius:16px; padding:0;
+      max-width:680px; width:100%; max-height:92vh; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+    .catalog-modal-header {
+      background:var(--green-mid); color:var(--white);
+      padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0;
+    }
+    .catalog-modal-header span { font-weight:600; font-size:0.95rem; }
+    .catalog-close {
+      background:none; border:none; color:var(--white); font-size:1.5rem;
+      cursor:pointer; line-height:1; padding:0 4px;
+    }
+    .catalog-img-wrap { overflow-y:auto; padding:16px; }
+    .catalog-img-wrap img { width:100%; height:auto; border-radius:8px; display:block; }
 
     /* ── 반응형 ── */
-    @media (max-width: 400px) {
-      .form-row { grid-template-columns: 1fr; }
-      .modal-account-number { font-size: 0.95rem; }
+    @media (max-width:400px) {
+      .form-row { grid-template-columns:1fr; }
+      .confirm-account-number { font-size:0.95rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🍶 옥수주조</h1>
-  <p>손님발주 주문서</p>
+<!-- ══════════════════════════════════════
+     성인인증 게이트 (첫 화면)
+══════════════════════════════════════ -->
+<div id="adultGate">
+  <div class="gate-logo">🍶</div>
+  <div class="gate-brand">옥수주조</div>
+  <div class="gate-sub">OKSU BREWING</div>
+
+  <div class="gate-card">
+    <div class="gate-warning">
+      ⚠️ 주류 판매 사이트입니다<br>
+      만 19세 미만은 구매하실 수 없습니다
+    </div>
+
+    <div class="gate-check-row">
+      <input type="checkbox" id="adultGateCheck" onchange="toggleGateBtn()">
+      <label for="adultGateCheck">
+        본인은 <strong>만 19세 이상</strong>의 성인임을 확인하며,
+        주류 구매 관련 법령을 준수할 것에 동의합니다.
+      </label>
+    </div>
+
+    <button class="gate-btn" id="gateBtn" onclick="passGate()" disabled>
+      동의하고 주문하기
+    </button>
+    <p class="gate-note">
+      미성년자가 허위로 성인 인증 후 주류를 구매하는 경우<br>
+      관련 법령에 따라 처벌받을 수 있습니다.
+    </p>
+  </div>
 </div>
 
-<div class="container">
+<!-- ══════════════════════════════════════
+     메인 주문 폼
+══════════════════════════════════════ -->
+<div id="mainContent">
 
-  <!-- 성인인증 -->
-  <div class="card">
-    <div class="card-header">🔞 성인인증</div>
-    <div class="card-body">
-      <div class="notice warning">
-        주류 제품입니다. 만 19세 미만에게는 판매하지 않습니다.
-      </div>
-      <div class="adult-check">
-        <input type="checkbox" id="adultCheck">
-        <label for="adultCheck">
-          본인은 <strong>만 19세 이상</strong>의 성인임을 확인하며,
-          주류 구매에 동의합니다.
-        </label>
-      </div>
-    </div>
+  <div class="header">
+    <h1>🍶 옥수주조</h1>
+    <p>손님발주 주문서</p>
   </div>
 
-  <!-- 상품 선택 -->
-  <div class="card">
-    <div class="card-header">🛒 상품 선택</div>
-    <div class="card-body">
-      <div class="notice">
-        최소 주문 <strong>3병</strong> 이상 · 50,000원 이상 배송비 무료
-      </div>
-      <div class="product-section-label">옥주 9도 — 병당 7,000원</div>
-      <div id="products-list"></div>
-      <div class="product-section-label" style="margin-top:14px;">프리미엄</div>
-      <div id="premium-list"></div>
-    </div>
-  </div>
+  <div class="container">
 
-  <!-- 주문 요약 -->
-  <div class="card">
-    <div class="card-header">📊 주문 요약</div>
-    <div class="card-body">
-      <div class="summary-row">
-        <span class="label">총 수량</span>
-        <span class="value" id="sumQty">0병</span>
+    <!-- 상품 선택 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">🛒 상품 선택</div>
+        <button class="catalog-btn" onclick="openCatalog()">📖 상품 카탈로그</button>
       </div>
-      <div class="summary-row">
-        <span class="label">상품금액</span>
-        <span class="value" id="sumSubtotal">0원</span>
-      </div>
-      <div class="summary-row">
-        <span class="label">배송료</span>
-        <span class="value" id="sumShipping">—</span>
-      </div>
-      <div class="summary-row total">
-        <span>최종 금액</span>
-        <span id="sumTotal">0원</span>
-      </div>
-      <div id="minOrderNotice" class="notice error" style="margin-top:12px; display:none;">
-        ⚠️ 최소 3병 이상 주문해야 합니다.
+      <div class="card-body">
+        <div class="notice">
+          최소 주문 <strong>3병</strong> 이상 · 50,000원 이상 배송비 무료
+        </div>
+        <div class="product-section-label">옥주 9도 — 병당 7,000원</div>
+        <div id="products-list"></div>
+        <div class="product-section-label" style="margin-top:14px;">프리미엄</div>
+        <div id="premium-list"></div>
       </div>
     </div>
-  </div>
 
-  <!-- 주문자 정보 -->
-  <div class="card">
-    <div class="card-header">👤 주문자 정보</div>
-    <div class="card-body">
-      <div class="form-row">
-        <div class="form-group">
-          <label>주문자명 <span class="req">*</span></label>
-          <input type="text" id="customerName" placeholder="이름">
+    <!-- 주문 요약 -->
+    <div class="card">
+      <div class="card-header"><div class="card-header-left">📊 주문 요약</div></div>
+      <div class="card-body">
+        <div class="summary-row">
+          <span class="label">총 수량</span>
+          <span class="value" id="sumQty">0병</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">상품금액</span>
+          <span class="value" id="sumSubtotal">0원</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">배송료</span>
+          <span class="value" id="sumShipping">—</span>
+        </div>
+        <div class="summary-row total">
+          <span>최종 금액</span>
+          <span id="sumTotal">0원</span>
+        </div>
+        <div id="minOrderNotice" class="notice error" style="margin-top:12px;display:none;">
+          ⚠️ 최소 3병 이상 주문해야 합니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- 주문자 정보 -->
+    <div class="card">
+      <div class="card-header"><div class="card-header-left">👤 주문자 정보</div></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>주문자명 <span class="req">*</span></label>
+            <input type="text" id="customerName" placeholder="이름">
+          </div>
+          <div class="form-group">
+            <label>연락처 <span class="req">*</span></label>
+            <input type="tel" id="phone" placeholder="010-0000-0000">
+          </div>
         </div>
         <div class="form-group">
-          <label>연락처 <span class="req">*</span></label>
-          <input type="tel" id="phone" placeholder="010-0000-0000">
+          <label>배송지 주소 <span class="req">*</span></label>
+          <div style="display:flex;gap:8px;margin-bottom:6px;">
+            <input type="text" id="zipCode" placeholder="우편번호" readonly
+              style="width:110px;flex-shrink:0;background:#f5f7f5;cursor:default;">
+            <button type="button" onclick="searchAddress()"
+              style="padding:10px 14px;background:var(--green-mid);color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;">
+              주소 검색
+            </button>
+          </div>
+          <input type="text" id="address" placeholder="주소 검색 버튼을 눌러주세요" readonly
+            style="background:#f5f7f5;cursor:default;margin-bottom:6px;">
+          <input type="text" id="addressDetail" placeholder="상세주소 입력 (동/호수 등)">
         </div>
-      </div>
-      <div class="form-group">
-        <label>배송지 주소 <span class="req">*</span></label>
-        <div style="display:flex;gap:8px;margin-bottom:6px;">
-          <input type="text" id="zipCode" placeholder="우편번호" readonly
-            style="width:110px;flex-shrink:0;background:#f5f7f5;cursor:default;">
-          <button type="button" onclick="searchAddress()"
-            style="padding:10px 14px;background:var(--green-mid);color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;">
-            주소 검색
-          </button>
+        <div class="form-group">
+          <label>입금자명 <span class="req">*</span></label>
+          <input type="text" id="depositorName" placeholder="계좌이체 시 입금자명">
         </div>
-        <input type="text" id="address" placeholder="주소 검색 버튼을 눌러주세요" readonly
-          style="background:#f5f7f5;cursor:default;margin-bottom:6px;">
-        <input type="text" id="addressDetail" placeholder="상세주소 입력 (동/호수 등)">
-      </div>
-      <div class="form-group">
-        <label>입금자명 <span class="req">*</span></label>
-        <input type="text" id="depositorName" placeholder="계좌이체 시 입금자명">
-      </div>
-      <div class="form-group">
-        <label>메모</label>
-        <textarea id="note" placeholder="배송 요청사항 등 (선택)"></textarea>
+        <div class="form-group">
+          <label>메모</label>
+          <textarea id="note" placeholder="배송 요청사항 등 (선택)"></textarea>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- 주문번호 -->
-  <div class="card">
-    <div class="card-header">🔖 주문번호</div>
-    <div class="card-body">
-      <div class="order-number-box">
-        <div>
-          <div class="order-number-label">자동 생성된 주문번호</div>
-          <div class="order-number-value" id="orderNumberDisplay">—</div>
-        </div>
-        <button class="refresh-btn" onclick="refreshOrderNumber()">새로 생성</button>
-      </div>
-      <div class="notice" style="margin-top:10px; margin-bottom:0;">
-        주문 완료 후 입금 메모에 주문번호를 기재해 주시면 빠른 확인이 가능합니다.
-      </div>
-    </div>
-  </div>
-
-  <!-- 제출 버튼 -->
-  <button class="submit-btn" id="submitBtn" onclick="submitOrder()" disabled>
-    주문하기 →
-  </button>
-
-</div>
-
-<!-- 성공 모달: 주문 완료 후에만 계좌 공개 -->
-<div class="modal-overlay" id="successModal">
-  <div class="modal">
-    <div class="modal-icon">🎉</div>
-    <div class="modal-title">주문이 완료되었습니다!</div>
-    <div class="modal-subtitle">입금 확인 후 발송됩니다.<br>아래 계좌로 24시간 이내 입금해 주세요.</div>
 
     <!-- 주문번호 -->
+    <div class="card">
+      <div class="card-header"><div class="card-header-left">🔖 주문번호</div></div>
+      <div class="card-body">
+        <div class="order-number-box">
+          <div>
+            <div class="order-number-label">자동 생성된 주문번호</div>
+            <div class="order-number-value" id="orderNumberDisplay">—</div>
+          </div>
+          <button class="refresh-btn" onclick="refreshOrderNumber()">새로 생성</button>
+        </div>
+        <div class="notice" style="margin-top:10px;margin-bottom:0;">
+          주문 완료 후 입금 메모에 주문번호를 기재해 주시면 빠른 확인이 가능합니다.
+        </div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="openConfirmModal()" disabled>
+      주문 내역 확인 →
+    </button>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     주문 확인 모달 (주문하기 클릭 시)
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="confirm-title">📋 주문 내역 확인</div>
+
+    <!-- 상품 목록 -->
+    <div class="confirm-items" id="confirmItems"></div>
+
+    <!-- 총금액 강조 -->
+    <div class="confirm-total-row">
+      <span class="confirm-total-label">지금 입금할 금액</span>
+      <span class="confirm-total-amount" id="confirmTotalAmount">0원</span>
+    </div>
+
+    <!-- 계좌 정보 -->
+    <div class="confirm-account-box">
+      <div class="confirm-account-label">신한은행 · 예금주 김진영</div>
+      <div class="confirm-account-row">
+        <div class="confirm-account-number">110-220-864189</div>
+        <button class="copy-btn" id="confirmCopyBtn" onclick="copyConfirmAccount()">복사</button>
+      </div>
+      <div class="confirm-account-holder">주문번호 <strong id="confirmOrderNum"></strong> 을 입금 메모에 꼭 기재해 주세요</div>
+    </div>
+
+    <div class="confirm-btn-row">
+      <button class="cancel-btn" onclick="closeConfirmModal()">취소</button>
+      <button class="ok-btn" id="confirmOkBtn" onclick="submitOrder()">입금하겠습니다</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     주문 완료 모달
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal success-modal">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">주문이 완료되었습니다!</div>
+    <div class="modal-subtitle">입금 확인 후 발송됩니다.</div>
+
     <div class="modal-order-box">
       <div class="modal-order-label">주문번호</div>
       <div class="modal-order-number" id="modalOrderNumber"></div>
       <div class="modal-order-hint">입금 메모에 주문번호를 꼭 기재해 주세요</div>
     </div>
 
-    <!-- 계좌 정보 (주문 완료 후 공개) -->
     <div class="modal-account-box">
-      <div class="modal-account-bank">신한은행</div>
+      <div class="modal-account-bank">신한은행 · 예금주 김진영</div>
       <div class="modal-account-row">
         <div class="modal-account-number">110-220-864189</div>
         <button class="copy-btn" id="modalCopyBtn" onclick="copyModalAccount()">복사</button>
       </div>
-      <div class="modal-account-holder">예금주: 김진영</div>
-      <div class="modal-account-notice">
-        입금자명이 주문자명과 다를 경우 메모란에 미리 기재해 주셨나요? 확인 부탁드립니다.
-      </div>
+      <div class="modal-account-holder">24시간 이내 입금해 주세요</div>
     </div>
 
     <button class="modal-btn" onclick="closeModal()">확인</button>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════
+     카탈로그 이미지 모달
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="catalogModal" onclick="closeCatalogOnBg(event)">
+  <div class="catalog-modal-inner">
+    <div class="catalog-modal-header">
+      <span>🍶 옥수주조 상품 카탈로그</span>
+      <button class="catalog-close" onclick="closeCatalog()">✕</button>
+    </div>
+    <div class="catalog-img-wrap">
+      <img src="https://raw.githubusercontent.com/kimcocosh/okju-order-system/main/catalog.jpg"
+           alt="옥수주조 상품 카탈로그"
+           onerror="this.parentElement.innerHTML='<p style=\'text-align:center;padding:40px;color:#888\'>이미지를 불러오는 중입니다...</p>'">
+    </div>
+  </div>
+</div>
+
 <script>
 var PRODUCTS = [
-  { id: 'original',     name: '오리지널',    price: 7000, type: 'okju' },
-  { id: 'sour',         name: '새콤',        price: 7000, type: 'okju' },
-  { id: 'corn',         name: '옥수수',      price: 7000, type: 'okju' },
-  { id: 'sweet-potato', name: '고구마',      price: 7000, type: 'okju' },
-  { id: 'banana',       name: '바나나',      price: 7000, type: 'okju' },
-  { id: 'passion',      name: '패션후르츠',  price: 7000, type: 'okju' },
-  { id: 'mango',        name: '망고',        price: 7000, type: 'okju' },
-  { id: 'blood-orange', name: '블러드오렌지',price: 7000, type: 'okju' },
-  { id: 'matcha',       name: '말차',        price: 7000, type: 'okju' },
-  { id: 'tomato',       name: '토마토',      price: 7000, type: 'okju' },
-  { id: 'blueberry',    name: '블루베리',    price: 7000, type: 'okju' },
-  { id: 'thisnight',    name: '이밤에취해',  price: 25000, type: 'premium' },
+  { id:'original',     name:'오리지널',     price:7000,  type:'okju' },
+  { id:'sour',         name:'새콤',         price:7000,  type:'okju' },
+  { id:'corn',         name:'옥수수',       price:7000,  type:'okju' },
+  { id:'sweet-potato', name:'고구마',       price:7000,  type:'okju' },
+  { id:'banana',       name:'바나나',       price:7000,  type:'okju' },
+  { id:'passion',      name:'패션후르츠',   price:7000,  type:'okju' },
+  { id:'mango',        name:'망고',         price:7000,  type:'okju' },
+  { id:'blood-orange', name:'블러드오렌지', price:7000,  type:'okju' },
+  { id:'matcha',       name:'말차',         price:7000,  type:'okju' },
+  { id:'tomato',       name:'토마토',       price:7000,  type:'okju' },
+  { id:'blueberry',    name:'블루베리',     price:7000,  type:'okju' },
+  { id:'thisnight',    name:'이밤에취해',   price:25000, type:'premium' },
 ];
 
-var SHIPPING_FEE = 3000;
+var SHIPPING_FEE            = 3000;
 var FREE_SHIPPING_THRESHOLD = 50000;
-var MIN_QTY = 3;
-var quantities = {};
+var MIN_QTY                 = 3;
+var quantities              = {};
+var currentOrderNumber      = '';
+var pendingOrderData        = null;
 
+// ── 성인인증 게이트 ──
+function toggleGateBtn() {
+  document.getElementById('gateBtn').disabled = !document.getElementById('adultGateCheck').checked;
+}
+function passGate() {
+  document.getElementById('adultGate').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// ── 초기화 ──
 (function init() {
   PRODUCTS.forEach(function(p) { quantities[p.id] = 0; });
   renderProducts();
   generateOrderNumber();
   updateSummary();
-  document.getElementById('adultCheck').addEventListener('change', updateSubmitBtn);
 })();
 
 function renderProducts() {
-  var okjuList = document.getElementById('products-list');
+  var okjuList    = document.getElementById('products-list');
   var premiumList = document.getElementById('premium-list');
   PRODUCTS.forEach(function(p) {
-    var row = createProductRow(p);
+    var row = document.createElement('div');
+    row.className = 'product-row';
+    row.innerHTML =
+      '<div class="product-name">' + p.name +
+        '<div class="product-price">' + p.price.toLocaleString() + '원/병</div>' +
+      '</div>' +
+      '<div class="qty-control">' +
+        '<button class="qty-btn" onclick="changeQty(\'' + p.id + '\',-1)">−</button>' +
+        '<div class="qty-display" id="qty-' + p.id + '">0</div>' +
+        '<button class="qty-btn" onclick="changeQty(\'' + p.id + '\',1)">+</button>' +
+      '</div>';
     if (p.type === 'okju') okjuList.appendChild(row);
     else premiumList.appendChild(row);
   });
-}
-
-function createProductRow(p) {
-  var div = document.createElement('div');
-  div.className = 'product-row';
-  div.innerHTML =
-    '<div class="product-name">' + p.name +
-      '<div class="product-price">' + p.price.toLocaleString() + '원/병</div>' +
-    '</div>' +
-    '<div class="qty-control">' +
-      '<button class="qty-btn" onclick="changeQty(\'' + p.id + '\',-1)">−</button>' +
-      '<div class="qty-display" id="qty-' + p.id + '">0</div>' +
-      '<button class="qty-btn" onclick="changeQty(\'' + p.id + '\',1)">+</button>' +
-    '</div>';
-  return div;
 }
 
 function changeQty(id, delta) {
@@ -446,156 +589,161 @@ function changeQty(id, delta) {
   updateSummary();
 }
 
+function getTotalQty() {
+  return PRODUCTS.reduce(function(s, p) { return s + (quantities[p.id] || 0); }, 0);
+}
+function getSubtotal() {
+  return PRODUCTS.reduce(function(s, p) { return s + (quantities[p.id] || 0) * p.price; }, 0);
+}
+
 function updateSummary() {
-  var totalQty = 0;
-  var subtotal = 0;
-  PRODUCTS.forEach(function(p) {
-    var q = quantities[p.id] || 0;
-    totalQty += q;
-    subtotal += q * p.price;
-  });
+  var totalQty = getTotalQty();
+  var subtotal = getSubtotal();
+  var isFree   = subtotal >= FREE_SHIPPING_THRESHOLD;
+  var shipping = totalQty === 0 ? 0 : (isFree ? 0 : SHIPPING_FEE);
 
-  var isFree = subtotal >= FREE_SHIPPING_THRESHOLD;
-  var shipping = (totalQty === 0) ? 0 : (isFree ? 0 : SHIPPING_FEE);
-
-  document.getElementById('sumQty').textContent = totalQty + '병';
+  document.getElementById('sumQty').textContent      = totalQty + '병';
   document.getElementById('sumSubtotal').textContent = subtotal.toLocaleString() + '원';
 
-  var shippingEl = document.getElementById('sumShipping');
+  var el = document.getElementById('sumShipping');
   if (totalQty === 0) {
-    shippingEl.innerHTML = '—';
+    el.innerHTML = '—';
   } else if (isFree) {
-    shippingEl.innerHTML = '<span style="text-decoration:line-through;color:#aaa">3,000원</span> <span class="free-badge">무료</span>';
+    el.innerHTML = '<span style="text-decoration:line-through;color:#aaa">3,000원</span> <span class="free-badge">무료</span>';
   } else {
-    shippingEl.textContent = SHIPPING_FEE.toLocaleString() + '원';
+    el.textContent = SHIPPING_FEE.toLocaleString() + '원';
   }
 
   document.getElementById('sumTotal').textContent = (subtotal + shipping).toLocaleString() + '원';
-
-  var minNotice = document.getElementById('minOrderNotice');
-  minNotice.style.display = (totalQty > 0 && totalQty < MIN_QTY) ? 'block' : 'none';
-
-  updateSubmitBtn();
+  document.getElementById('minOrderNotice').style.display = (totalQty > 0 && totalQty < MIN_QTY) ? 'block' : 'none';
+  document.getElementById('submitBtn').disabled = !(totalQty >= MIN_QTY);
 }
 
-function updateSubmitBtn() {
-  var adultOk = document.getElementById('adultCheck').checked;
-  document.getElementById('submitBtn').disabled = !(adultOk && getTotalQty() >= MIN_QTY);
-}
-
-function getTotalQty() {
-  return PRODUCTS.reduce(function(sum, p) { return sum + (quantities[p.id] || 0); }, 0);
-}
-
-function getSubtotal() {
-  return PRODUCTS.reduce(function(sum, p) { return sum + (quantities[p.id] || 0) * p.price; }, 0);
-}
-
-// 주문번호: OJ-XXXX (7자, 입금 메모에 쓰기 쉬운 길이)
-var currentOrderNumber = '';
-
+// ── 주문번호 ──
 function generateOrderNumber() {
-  var seq = String(Math.floor(Math.random() * 9000) + 1000);
-  currentOrderNumber = 'OJ-' + seq;
+  currentOrderNumber = 'OJ-' + (Math.floor(Math.random() * 9000) + 1000);
   document.getElementById('orderNumberDisplay').textContent = currentOrderNumber;
 }
-
 function refreshOrderNumber() { generateOrderNumber(); }
 
+// ── 주소 검색 ──
 function searchAddress() {
   new daum.Postcode({
     oncomplete: function(data) {
-      document.getElementById('zipCode').value = data.zonecode;
-      document.getElementById('address').value = data.roadAddress || data.jibunAddress;
+      document.getElementById('zipCode').value  = data.zonecode;
+      document.getElementById('address').value  = data.roadAddress || data.jibunAddress;
       document.getElementById('addressDetail').focus();
     }
   }).open();
 }
 
-function copyModalAccount() {
-  var accountText = '110-220-864189';
-  var btn = document.getElementById('modalCopyBtn');
-  navigator.clipboard.writeText(accountText).then(function() {
-    btn.textContent = '복사됨!';
-    btn.classList.add('copied');
-    setTimeout(function() { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
-  }).catch(function() {
-    var el = document.createElement('textarea');
-    el.value = accountText;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    btn.textContent = '복사됨!';
-    btn.classList.add('copied');
-    setTimeout(function() { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-function submitOrder() {
-  var customerName = document.getElementById('customerName').value.trim();
-  var phone = document.getElementById('phone').value.trim();
-  var address = document.getElementById('address').value.trim();
+// ── 주문 확인 모달 열기 ──
+function openConfirmModal() {
+  var customerName  = document.getElementById('customerName').value.trim();
+  var phone         = document.getElementById('phone').value.trim();
+  var address       = document.getElementById('address').value.trim();
   var depositorName = document.getElementById('depositorName').value.trim();
 
   if (!customerName || !phone || !address || !depositorName) {
     alert('주문자명, 연락처, 배송지 주소, 입금자명은 필수 입력 항목입니다.');
     return;
   }
-
-  var totalQty = getTotalQty();
-  if (totalQty < MIN_QTY) {
+  if (getTotalQty() < MIN_QTY) {
     alert('최소 3병 이상 주문해야 합니다.');
     return;
   }
 
-  var subtotal = getSubtotal();
+  var subtotal    = getSubtotal();
   var shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  var totalAmount = subtotal + shippingFee;
 
   var items = PRODUCTS
     .filter(function(p) { return (quantities[p.id] || 0) > 0; })
     .map(function(p) { return { name: p.name, qty: quantities[p.id], price: p.price }; });
 
-  var orderData = {
-    orderNumber: currentOrderNumber,
-    customerName: customerName,
-    phone: phone,
-    address: address,
+  // 확인 모달 내용 채우기
+  var itemsHtml = items.map(function(i) {
+    return '<div class="confirm-item-row">' +
+      '<span>' + i.name + ' × ' + i.qty + '병</span>' +
+      '<span>' + (i.price * i.qty).toLocaleString() + '원</span>' +
+      '</div>';
+  }).join('');
+  itemsHtml += '<div class="confirm-item-row" style="color:var(--text-light)">' +
+    '<span>배송료</span><span>' + (shippingFee === 0 ? '무료' : shippingFee.toLocaleString() + '원') + '</span></div>';
+
+  document.getElementById('confirmItems').innerHTML       = itemsHtml;
+  document.getElementById('confirmTotalAmount').textContent = totalAmount.toLocaleString() + '원';
+  document.getElementById('confirmOrderNum').textContent  = currentOrderNumber;
+  document.getElementById('confirmModal').classList.add('active');
+
+  // 제출용 데이터 미리 저장
+  pendingOrderData = {
+    orderNumber:   currentOrderNumber,
+    customerName:  customerName,
+    phone:         phone,
+    address:       address,
     addressDetail: document.getElementById('addressDetail').value.trim(),
-    zipCode: document.getElementById('zipCode').value.trim(),
+    zipCode:       document.getElementById('zipCode').value.trim(),
     depositorName: depositorName,
-    note: document.getElementById('note').value.trim(),
-    items: items,
-    totalQty: totalQty,
-    subtotal: subtotal,
-    shippingFee: shippingFee,
-    totalAmount: subtotal + shippingFee,
+    note:          document.getElementById('note').value.trim(),
+    items:         items,
+    totalQty:      getTotalQty(),
+    subtotal:      subtotal,
+    shippingFee:   shippingFee,
+    totalAmount:   totalAmount,
     adultVerified: true,
   };
+}
 
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = '주문 처리 중...';
+function closeConfirmModal() {
+  document.getElementById('confirmModal').classList.remove('active');
+  pendingOrderData = null;
+}
+
+// ── 실제 주문 제출 ──
+function submitOrder() {
+  if (!pendingOrderData) return;
+
+  var okBtn = document.getElementById('confirmOkBtn');
+  okBtn.disabled    = true;
+  okBtn.textContent = '전송 중...';
 
   google.script.run
     .withSuccessHandler(function(result) {
+      document.getElementById('confirmModal').classList.remove('active');
       if (result.success) {
         document.getElementById('modalOrderNumber').textContent = currentOrderNumber;
         document.getElementById('successModal').classList.add('active');
       } else {
         alert('주문 저장 중 오류가 발생했습니다: ' + result.message);
-        btn.disabled = false;
-        btn.textContent = '주문하기 →';
       }
+      okBtn.disabled    = false;
+      okBtn.textContent = '입금하겠습니다';
     })
     .withFailureHandler(function(err) {
+      document.getElementById('confirmModal').classList.remove('active');
       alert('오류가 발생했습니다: ' + err.message);
-      btn.disabled = false;
-      btn.textContent = '주문하기 →';
+      okBtn.disabled    = false;
+      okBtn.textContent = '입금하겠습니다';
     })
-    .saveOrder(orderData);
+    .saveOrder(pendingOrderData);
 }
 
+// ── 복사 ──
+function copyText(text, btnId) {
+  var btn = document.getElementById(btnId);
+  navigator.clipboard.writeText(text).catch(function() {
+    var el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  }).finally ? navigator.clipboard.writeText(text).finally(function() {}) : null;
+  btn.textContent = '복사됨!'; btn.classList.add('copied');
+  setTimeout(function() { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+}
+function copyConfirmAccount() { copyText('110-220-864189', 'confirmCopyBtn'); }
+function copyModalAccount()   { copyText('110-220-864189', 'modalCopyBtn'); }
+
+// ── 완료 모달 닫기 ──
 function closeModal() {
   document.getElementById('successModal').classList.remove('active');
   PRODUCTS.forEach(function(p) {
@@ -603,13 +751,17 @@ function closeModal() {
     var el = document.getElementById('qty-' + p.id);
     if (el) el.textContent = '0';
   });
-  ['customerName','phone','address','addressDetail','zipCode','depositorName','note'].forEach(function(id) {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('adultCheck').checked = false;
+  ['customerName','phone','address','addressDetail','zipCode','depositorName','note']
+    .forEach(function(id) { document.getElementById(id).value = ''; });
   updateSummary();
   generateOrderNumber();
+  pendingOrderData = null;
 }
+
+// ── 카탈로그 모달 ──
+function openCatalog()  { document.getElementById('catalogModal').classList.add('active'); }
+function closeCatalog() { document.getElementById('catalogModal').classList.remove('active'); }
+function closeCatalogOnBg(e) { if (e.target === document.getElementById('catalogModal')) closeCatalog(); }
 </script>
 </body>
 </html>
