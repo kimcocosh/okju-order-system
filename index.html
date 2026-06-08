@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>옥수주조 손님발주 시스템</title>
+  <title>옥수주조 주문하기</title>
   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <style>
     :root {
@@ -53,9 +53,7 @@
     .gate-btn:disabled { background:#c8d8c8; color:#8a9a8a; cursor:not-allowed; }
     .gate-note { color:var(--text-light); font-size:0.75rem; text-align:center; margin-top:14px; line-height:1.5; }
 
-    /* ── 메인 콘텐츠: JS로 gate 통과 후 표시 ── */
-    #mainContent { display:none !important; }
-    #mainContent.visible { display:block !important; }
+    /* mainContent는 항상 렌더링 — 게이트(position:fixed 흰배경)가 덮어서 보이지 않음 */
 
     .header { background:var(--green-dark); color:var(--white); padding:20px 16px 16px; text-align:center; }
     .header h1 { font-size:1.4rem; letter-spacing:2px; margin-bottom:4px; }
@@ -315,8 +313,6 @@
        style="max-width:220px;width:80%;margin-bottom:36px;border-radius:12px;">
 
   <div class="gate-card">
-    <div>
-
     <div class="gate-check-row">
       <input type="checkbox" id="adultGateCheck" onchange="toggleGateBtn()">
       <label for="adultGateCheck">
@@ -565,7 +561,6 @@ function toggleGateBtn() {
 }
 function passGate() {
   document.getElementById('adultGate').style.display = 'none';
-  document.getElementById('mainContent').classList.add('visible');
   window.scrollTo(0, 0);
 }
 
