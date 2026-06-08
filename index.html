@@ -25,7 +25,7 @@
 
     /* ── 성인인증 게이트 ── */
     #adultGate {
-      position:fixed; inset:0; background:var(--green-dark);
+      position:fixed; inset:0; background:#ffffff;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       z-index:200; padding:24px;
     }
@@ -33,30 +33,25 @@
     .gate-brand { color:var(--white); font-size:1.6rem; font-weight:700; letter-spacing:3px; margin-bottom:4px; }
     .gate-sub { color:#a8c8a8; font-size:0.85rem; letter-spacing:1px; margin-bottom:40px; }
     .gate-card {
-      background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15);
+      background:#f8faf8; border:1px solid var(--border);
       border-radius:16px; padding:28px 24px; max-width:380px; width:100%;
-    }
-    .gate-warning {
-      background:rgba(211,47,47,0.15); border:1px solid rgba(211,47,47,0.4);
-      border-radius:8px; padding:12px 14px; margin-bottom:20px;
-      color:#ffaaaa; font-size:0.85rem; line-height:1.5; text-align:center;
     }
     .gate-check-row {
       display:flex; align-items:flex-start; gap:12px; margin-bottom:24px; cursor:pointer;
     }
     .gate-check-row input[type="checkbox"] {
-      width:22px; height:22px; accent-color:var(--accent); flex-shrink:0; margin-top:2px; cursor:pointer;
+      width:22px; height:22px; accent-color:var(--green-mid); flex-shrink:0; margin-top:2px; cursor:pointer;
     }
-    .gate-check-row label { color:#ddeedd; font-size:0.9rem; line-height:1.6; cursor:pointer; }
-    .gate-check-row label strong { color:var(--accent); }
+    .gate-check-row label { color:var(--text); font-size:0.9rem; line-height:1.6; cursor:pointer; }
+    .gate-check-row label strong { color:var(--danger); }
     .gate-btn {
       width:100%; padding:16px; background:var(--green-mid); color:var(--white);
       border:none; border-radius:10px; font-size:1rem; font-weight:700;
       cursor:pointer; font-family:inherit; letter-spacing:1px; transition:all 0.2s;
     }
-    .gate-btn:hover:not(:disabled) { background:var(--green-light); transform:translateY(-1px); }
-    .gate-btn:disabled { background:#3a4a3a; color:#6a7a6a; cursor:not-allowed; }
-    .gate-note { color:#6a8a6a; font-size:0.75rem; text-align:center; margin-top:14px; line-height:1.5; }
+    .gate-btn:hover:not(:disabled) { background:var(--green-dark); transform:translateY(-1px); }
+    .gate-btn:disabled { background:#c8d8c8; color:#8a9a8a; cursor:not-allowed; }
+    .gate-note { color:var(--text-light); font-size:0.75rem; text-align:center; margin-top:14px; line-height:1.5; }
 
     /* ── 메인 콘텐츠 ── */
     #mainContent { display:none; }
@@ -314,7 +309,7 @@
      성인인증 게이트 (첫 화면)
 ══════════════════════════════════════ -->
 <div id="adultGate">
-  <img src="https://raw.githubusercontent.com/kimcocosh/okju-order-system/main/logo.jpg"
+  <img src="https://raw.githubusercontent.com/kimcocosh/okju-order-system/main/logo.png"
        alt="옥수주조"
        style="max-width:220px;width:80%;margin-bottom:36px;border-radius:12px;">
 
