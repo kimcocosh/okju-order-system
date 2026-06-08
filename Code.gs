@@ -1,3 +1,43 @@
+// ===== 헤더 초기 세팅 (최초 1회 GAS 에디터에서 직접 실행) =====
+function setupHeaders() {
+  var ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) { sheet = ss.insertSheet(SHEET_NAME); }
+
+  var headers = [
+    '주문번호', '주문일시', '주문자명', '연락처',
+    '배송지', '상세주소', '우편번호',
+    '상품내역', '총수량(병)', '상품금액', '배송료', '최종금액',
+    '입금자명', '성인인증', '비고'
+  ];
+
+  // 1행에 헤더 삽입 (기존 데이터가 있으면 위로 밀림)
+  sheet.insertRowBefore(1);
+  var hRange = sheet.getRange(1, 1, 1, headers.length);
+  hRange.setValues([headers]);
+  hRange.setBackground('#2d4a2d').setFontColor('#ffffff').setFontWeight('bold');
+  sheet.setFrozenRows(1);
+
+  // 컬럼 너비 정리
+  sheet.setColumnWidth(1, 100);  // 주문번호
+  sheet.setColumnWidth(2, 150);  // 주문일시
+  sheet.setColumnWidth(3, 80);   // 주문자명
+  sheet.setColumnWidth(4, 120);  // 연락처
+  sheet.setColumnWidth(5, 220);  // 배송지
+  sheet.setColumnWidth(6, 120);  // 상세주소
+  sheet.setColumnWidth(7, 70);   // 우편번호
+  sheet.setColumnWidth(8, 250);  // 상품내역
+  sheet.setColumnWidth(9, 80);   // 총수량
+  sheet.setColumnWidth(10, 80);  // 상품금액
+  sheet.setColumnWidth(11, 70);  // 배송료
+  sheet.setColumnWidth(12, 80);  // 최종금액
+  sheet.setColumnWidth(13, 80);  // 입금자명
+  sheet.setColumnWidth(14, 70);  // 성인인증
+  sheet.setColumnWidth(15, 150); // 비고
+
+  SpreadsheetApp.getUi().alert('헤더 설정 완료!');
+}
+
 // ===== 설정 =====
 var SPREADSHEET_ID = '1jAd4-or1HkisOs3p9MrNT9gvP9USL_S9K302RBsVT80';
 var SHEET_NAME     = '주문내역';
