@@ -1,7 +1,7 @@
 // ===== 설정 =====
-var SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE'; // 본인 스프레드시트 ID로 교체
+var SPREADSHEET_ID = '1jAd4-or1HkisOs3p9MrNT9gvP9USL_S9K302RBsVT80';
 var SHEET_NAME     = '주문내역';
-var CJ_SHEET_NAME  = 'CJ택배양식';
+var CJ_SHEET_NAME  = 'cj택배';
 
 var NOTIFY_EMAILS  = ['kimcocosh@gmail.com', 'pakkom10@gmail.com'];
 
@@ -103,25 +103,7 @@ function getOrCreateOrderSheet(ss) {
 function getOrCreateCJSheet(ss) {
   var sheet = ss.getSheetByName(CJ_SHEET_NAME);
   if (!sheet) {
-    sheet = ss.insertSheet(CJ_SHEET_NAME);
-    var headers = [
-      '받는분성명', '받는분전화번호', '받는분주소',
-      '품목명', '박스', '운임구분', '박스타입', '내품명', '배송메세지1'
-    ];
-    var hRange = sheet.getRange(1, 1, 1, headers.length);
-    hRange.setValues([headers]);
-    hRange.setBackground('#1a3a6a').setFontColor('#ffffff').setFontWeight('bold');
-    sheet.setFrozenRows(1);
-    // 컬럼 너비 자동 조정
-    sheet.setColumnWidth(1, 100);
-    sheet.setColumnWidth(2, 130);
-    sheet.setColumnWidth(3, 280);
-    sheet.setColumnWidth(4, 120);
-    sheet.setColumnWidth(5, 50);
-    sheet.setColumnWidth(6, 70);
-    sheet.setColumnWidth(7, 60);
-    sheet.setColumnWidth(8, 220);
-    sheet.setColumnWidth(9, 180);
+    throw new Error('시트를 찾을 수 없습니다: ' + CJ_SHEET_NAME);
   }
   return sheet;
 }
