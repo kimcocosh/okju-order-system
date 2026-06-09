@@ -43,7 +43,7 @@ var SPREADSHEET_ID = '1jAd4-or1HkisOs3p9MrNT9gvP9USL_S9K302RBsVT80';
 var SHEET_NAME     = '주문내역';
 var CJ_SHEET_NAME  = 'cj택배';
 
-var NOTIFY_EMAILS  = ['kimcocosh@gmail.com', 'pakkom10@gmail.com'];
+var NOTIFY_EMAILS  = ['kimcocosh@gmail.com', 'pakkom10@gmail.com', 'oksujujo@naver.com'];
 
 var SHIPPING_FEE           = 3000;
 var FREE_SHIPPING_THRESHOLD = 50000;
