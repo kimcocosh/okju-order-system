@@ -35,7 +35,7 @@ function setupHeaders() {
   sheet.setColumnWidth(14, 70);  // 성인인증
   sheet.setColumnWidth(15, 150); // 비고
 
-  SpreadsheetApp.getUi().alert('헤더 설정 완료!');
+  Logger.log('헤더 설정 완료!');
 }
 
 // ===== 설정 =====
