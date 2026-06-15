@@ -362,6 +362,8 @@
         <div id="products-list"></div>
         <div class="product-section-label" style="margin-top:14px;">프리미엄</div>
         <div id="premium-list"></div>
+        <div class="product-section-label" style="margin-top:14px;">굿즈</div>
+        <div id="goods-list"></div>
       </div>
     </div>
 
@@ -410,7 +412,7 @@
           <div style="display:flex;gap:8px;margin-bottom:6px;">
             <input type="text" id="zipCode" placeholder="우편번호" readonly
               style="width:110px;flex-shrink:0;background:#f5f7f5;cursor:default;">
-            <button type="button" onclick="searchAddress()"
+            <button type="button" onclick="openPostcode()"
               style="padding:10px 14px;background:var(--green-mid);color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;">
               주소 검색
             </button>
@@ -516,6 +518,19 @@
 </div>
 
 <!-- ══════════════════════════════════════
+     우편번호 모달
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="postcodeModal" style="z-index:300;">
+  <div style="background:var(--white);border-radius:12px;overflow:hidden;width:100%;max-width:500px;display:flex;flex-direction:column;">
+    <div style="background:var(--green-mid);color:var(--white);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:600;font-size:0.9rem;">📮 주소 검색</span>
+      <button onclick="closePostcode()" style="background:none;border:none;color:var(--white);font-size:1.5rem;cursor:pointer;line-height:1;padding:0 2px;">✕</button>
+    </div>
+    <div id="postcodeLayer" style="height:450px;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      카탈로그 이미지 모달
 ══════════════════════════════════════ -->
 <div class="modal-overlay" id="catalogModal" onclick="closeCatalogOnBg(event)">
@@ -539,18 +554,22 @@
 
 <script>
 var PRODUCTS = [
-  { id:'original',     name:'오리지널',     price:7000,  type:'okju' },
-  { id:'sour',         name:'새콤',         price:7000,  type:'okju' },
-  { id:'corn',         name:'옥수수',       price:7000,  type:'okju' },
-  { id:'sweet-potato', name:'고구마',       price:7000,  type:'okju' },
-  { id:'banana',       name:'바나나',       price:7000,  type:'okju' },
-  { id:'passion',      name:'패션후르츠',   price:7000,  type:'okju' },
-  { id:'mango',        name:'망고',         price:7000,  type:'okju' },
-  { id:'blood-orange', name:'블러드오렌지', price:7000,  type:'okju' },
-  { id:'matcha',       name:'말차',         price:7000,  type:'okju' },
-  { id:'tomato',       name:'토마토',       price:7000,  type:'okju' },
-  { id:'blueberry',    name:'블루베리',     price:7000,  type:'okju' },
-  { id:'thisnight',    name:'이밤에취해',   price:25000, type:'premium' },
+  { id:'original',     name:'오리지널',     price:7000,  type:'okju',    unit:'병' },
+  { id:'sour',         name:'새콤',         price:7000,  type:'okju',    unit:'병' },
+  { id:'corn',         name:'옥수수',       price:7000,  type:'okju',    unit:'병' },
+  { id:'sweet-potato', name:'고구마',       price:7000,  type:'okju',    unit:'병' },
+  { id:'banana',       name:'바나나',       price:7000,  type:'okju',    unit:'병' },
+  { id:'passion',      name:'패션후르츠',   price:7000,  type:'okju',    unit:'병' },
+  { id:'mango',        name:'망고',         price:7000,  type:'okju',    unit:'병' },
+  { id:'blood-orange', name:'블러드오렌지', price:7000,  type:'okju',    unit:'병' },
+  { id:'matcha',       name:'말차',         price:7000,  type:'okju',    unit:'병' },
+  { id:'tomato',       name:'토마토',       price:7000,  type:'okju',    unit:'병' },
+  { id:'blueberry',    name:'블루베리',     price:7000,  type:'okju',    unit:'병' },
+  { id:'thisnight',    name:'이밤에취해',   price:25000, type:'premium', unit:'병' },
+  { id:'mini-glass',   name:'미니유리잔',         price:5000, type:'goods', unit:'개' },
+  { id:'bag-orange',   name:'고급보냉백 오렌지',  price:4000, type:'goods', unit:'개' },
+  { id:'bag-mint',     name:'고급보냉백 민트',    price:4000, type:'goods', unit:'개' },
+  { id:'bag-cream',    name:'고급보냉백 크림',    price:4000, type:'goods', unit:'개' },
 ];
 
 var SHIPPING_FEE            = 3000;
@@ -580,12 +599,13 @@ function passGate() {
 function renderProducts() {
   var okjuList    = document.getElementById('products-list');
   var premiumList = document.getElementById('premium-list');
+  var goodsList   = document.getElementById('goods-list');
   PRODUCTS.forEach(function(p) {
     var row = document.createElement('div');
     row.className = 'product-row';
     row.innerHTML =
       '<div class="product-name">' + p.name +
-        '<div class="product-price">' + p.price.toLocaleString() + '원/병</div>' +
+        '<div class="product-price">' + p.price.toLocaleString() + '원/' + (p.unit || '병') + '</div>' +
       '</div>' +
       '<div class="qty-control">' +
         '<button class="qty-btn" onclick="changeQty(\'' + p.id + '\',-1)">−</button>' +
@@ -593,7 +613,8 @@ function renderProducts() {
         '<button class="qty-btn" onclick="changeQty(\'' + p.id + '\',1)">+</button>' +
       '</div>';
     if (p.type === 'okju') okjuList.appendChild(row);
-    else premiumList.appendChild(row);
+    else if (p.type === 'premium') premiumList.appendChild(row);
+    else goodsList.appendChild(row);
   });
 }
 
@@ -606,17 +627,22 @@ function changeQty(id, delta) {
 function getTotalQty() {
   return PRODUCTS.reduce(function(s, p) { return s + (quantities[p.id] || 0); }, 0);
 }
+function getBottleQty() {
+  return PRODUCTS.filter(function(p) { return p.type !== 'goods'; })
+    .reduce(function(s, p) { return s + (quantities[p.id] || 0); }, 0);
+}
 function getSubtotal() {
   return PRODUCTS.reduce(function(s, p) { return s + (quantities[p.id] || 0) * p.price; }, 0);
 }
 
 function updateSummary() {
-  var totalQty = getTotalQty();
-  var subtotal = getSubtotal();
-  var isFree   = subtotal >= FREE_SHIPPING_THRESHOLD;
-  var shipping = totalQty === 0 ? 0 : (isFree ? 0 : SHIPPING_FEE);
+  var bottleQty = getBottleQty();
+  var totalQty  = getTotalQty();
+  var subtotal  = getSubtotal();
+  var isFree    = subtotal >= FREE_SHIPPING_THRESHOLD;
+  var shipping  = totalQty === 0 ? 0 : (isFree ? 0 : SHIPPING_FEE);
 
-  document.getElementById('sumQty').textContent      = totalQty + '병';
+  document.getElementById('sumQty').textContent      = bottleQty + '병';
   document.getElementById('sumSubtotal').textContent = subtotal.toLocaleString() + '원';
 
   var el = document.getElementById('sumShipping');
@@ -629,8 +655,8 @@ function updateSummary() {
   }
 
   document.getElementById('sumTotal').textContent = (subtotal + shipping).toLocaleString() + '원';
-  document.getElementById('minOrderNotice').style.display = (totalQty > 0 && totalQty < MIN_QTY) ? 'block' : 'none';
-  document.getElementById('submitBtn').disabled = !(totalQty >= MIN_QTY);
+  document.getElementById('minOrderNotice').style.display = (bottleQty > 0 && bottleQty < MIN_QTY) ? 'block' : 'none';
+  document.getElementById('submitBtn').disabled = !(bottleQty >= MIN_QTY);
 }
 
 // ── 주문번호 ──
@@ -641,14 +667,23 @@ function generateOrderNumber() {
 function refreshOrderNumber() { generateOrderNumber(); }
 
 // ── 주소 검색 ──
-function searchAddress() {
+function openPostcode() {
+  var layer = document.getElementById('postcodeLayer');
+  layer.innerHTML = '';
+  document.getElementById('postcodeModal').classList.add('active');
   new daum.Postcode({
     oncomplete: function(data) {
       document.getElementById('zipCode').value  = data.zonecode;
       document.getElementById('address').value  = data.roadAddress || data.jibunAddress;
+      closePostcode();
       document.getElementById('addressDetail').focus();
-    }
-  }).open();
+    },
+    width:  '100%',
+    height: '100%',
+  }).embed(layer);
+}
+function closePostcode() {
+  document.getElementById('postcodeModal').classList.remove('active');
 }
 
 // ── 주문 확인 모달 열기 ──
@@ -662,7 +697,7 @@ function openConfirmModal() {
     alert('주문자명, 연락처, 배송지 주소, 입금자명은 필수 입력 항목입니다.');
     return;
   }
-  if (getTotalQty() < MIN_QTY) {
+  if (getBottleQty() < MIN_QTY) {
     alert('최소 3병 이상 주문해야 합니다.');
     return;
   }
@@ -673,12 +708,12 @@ function openConfirmModal() {
 
   var items = PRODUCTS
     .filter(function(p) { return (quantities[p.id] || 0) > 0; })
-    .map(function(p) { return { name: p.name, qty: quantities[p.id], price: p.price }; });
+    .map(function(p) { return { name: p.name, qty: quantities[p.id], price: p.price, unit: p.unit || '병' }; });
 
   // 확인 모달 내용 채우기
   var itemsHtml = items.map(function(i) {
     return '<div class="confirm-item-row">' +
-      '<span>' + i.name + ' × ' + i.qty + '병</span>' +
+      '<span>' + i.name + ' × ' + i.qty + i.unit + '</span>' +
       '<span>' + (i.price * i.qty).toLocaleString() + '원</span>' +
       '</div>';
   }).join('');
@@ -701,7 +736,7 @@ function openConfirmModal() {
     depositorName: depositorName,
     note:          document.getElementById('note').value.trim(),
     items:         items,
-    totalQty:      getTotalQty(),
+    totalQty:      getBottleQty(),
     subtotal:      subtotal,
     shippingFee:   shippingFee,
     totalAmount:   totalAmount,

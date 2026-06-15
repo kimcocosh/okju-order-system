@@ -77,7 +77,7 @@ function saveOrder(data) {
 
   var now       = new Date();
   var timestamp = Utilities.formatDate(now, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
-  var itemsText = data.items.map(function(i) { return i.name + ' x' + i.qty + '병'; }).join(', ');
+  var itemsText = data.items.map(function(i) { return i.name + ' x' + i.qty + (i.unit || '병'); }).join(', ');
 
   // ── 주문내역 시트에 저장 ──
   var orderRow = [
@@ -100,7 +100,7 @@ function saveOrder(data) {
   // ── CJ택배양식 시트에 저장 ──
   var fullAddress = data.address + (data.addressDetail ? ' ' + data.addressDetail : '');
   var boxes = data.totalQty <= 14 ? 1 : data.totalQty <= 28 ? 2 : 3;
-  var itemDetail = data.items.map(function(i) { return i.name + i.qty + '개'; }).join(', ');
+  var itemDetail = data.items.map(function(i) { return i.name + ' ' + i.qty + (i.unit || '병'); }).join(', ');
 
   var cjRow = [
     data.customerName,      // 받는분성명
@@ -154,7 +154,7 @@ function sendOrderNotification(data, timestamp) {
 
   var itemRows = data.items.map(function(i) {
     return '<tr><td style="padding:6px 12px;">' + i.name + '</td>'
-         + '<td style="padding:6px 12px; text-align:center;">' + i.qty + '병</td>'
+         + '<td style="padding:6px 12px; text-align:center;">' + i.qty + (i.unit || '병') + '</td>'
          + '<td style="padding:6px 12px; text-align:right;">' + (i.price * i.qty).toLocaleString() + '원</td></tr>';
   }).join('');
 
