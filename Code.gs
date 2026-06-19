@@ -90,6 +90,8 @@ function saveOrder(data) {
     data.adultVerified ? '확인' : '미확인',
     data.note || ''
   ];
+  var nextRow = sheet.getLastRow() + 1;
+  sheet.getRange(nextRow, 4).setNumberFormat('@'); // 전화번호 열을 텍스트로 미리 지정
   sheet.appendRow(orderRow);
 
   var lastRow = sheet.getLastRow();
@@ -113,6 +115,8 @@ function saveOrder(data) {
     itemDetail,             // 내품명
     data.note || ''         // 배송메세지1
   ];
+  var cjNextRow = cjSheet.getLastRow() + 1;
+  cjSheet.getRange(cjNextRow, 2).setNumberFormat('@'); // CJ 전화번호 열을 텍스트로 미리 지정
   cjSheet.appendRow(cjRow);
 
   // ── 이메일 알림 ──
