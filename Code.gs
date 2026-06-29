@@ -90,8 +90,6 @@ function saveOrder(data) {
     data.adultVerified ? '확인' : '미확인',
     data.note || ''
   ];
-  var nextRow = sheet.getLastRow() + 1;
-  sheet.getRange(nextRow, 4).setNumberFormat('@'); // 전화번호 열을 텍스트로 미리 지정
   sheet.appendRow(orderRow);
 
   var lastRow = sheet.getLastRow();
@@ -115,8 +113,6 @@ function saveOrder(data) {
     itemDetail,             // 내품명
     data.note || ''         // 배송메세지1
   ];
-  var cjNextRow = cjSheet.getLastRow() + 1;
-  cjSheet.getRange(cjNextRow, 2).setNumberFormat('@'); // CJ 전화번호 열을 텍스트로 미리 지정
   cjSheet.appendRow(cjRow);
 
   // ── 이메일 알림 ──
@@ -141,6 +137,8 @@ function getOrCreateOrderSheet(ss) {
     hRange.setBackground('#2d4a2d').setFontColor('#ffffff').setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
+  // D열(연락처) 전체를 텍스트 형식으로 고정 — 010 앞자리 0 보존
+  sheet.getRange('D:D').setNumberFormat('@');
   return sheet;
 }
 
@@ -149,6 +147,8 @@ function getOrCreateCJSheet(ss) {
   if (!sheet) {
     throw new Error('시트를 찾을 수 없습니다: ' + CJ_SHEET_NAME);
   }
+  // B열(전화번호) 전체를 텍스트 형식으로 고정 — 010 앞자리 0 보존
+  sheet.getRange('B:B').setNumberFormat('@');
   return sheet;
 }
 
